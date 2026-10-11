@@ -1,9 +1,16 @@
 plugins {
     id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.showdown' version '8.1.1'
 }
 
 group = 'org.example'
-version = '1.0-SNAPSHOT'
+version = findProperty('version') ?: '0.1.0'
+
+sourceCompatibility = '23'
+targetCompatibility = '23'
+
+mainClassName = 'org.example.ToDoApp' // for 'application' plugin
 
 repositories {
     mavenCentral()
@@ -17,4 +24,35 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+shadowJar {
+    archiveBaseName.set("todo-app")
+    archiveClassifier.set("") // no classifier: produce todo-app-<version>.jar
+    archiveVersion.set(project.version.toString())
+    mergeServiceFiles()
+}
+
+tasks.jar {
+    enabled = false
+}
+
+tasks.named("distZip") { Task it ->
+    dependsOn tasks.named("shadowJar")
+}
+
+tasks.named("distTar") { Task it ->
+    dependsOn tasks.named("shadowJar")
+}
+
+tasks.named("startScripts") { Task it ->
+    dependsOn tasks.named("shadowJar")
+}
+
+tasks.named("startShadowScripts") { Task it ->
+    dependsOn tasks.named("jar")
+}
+
+tasks.build {
+    dependsOn shadowJar
 }
