@@ -7,10 +7,15 @@ plugins {
 group = 'org.example'
 version = findProperty('version') ?: '0.1.0'
 
-sourceCompatibility = '23'
-targetCompatibility = '23'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(23)
+    }
+}
 
-mainClassName = 'org.example.ToDoApp' // for 'application' plugin
+application {
+    mainClass = 'org.example.ToDoApp' // Исправлено: mainClassName -> application { mainClass }
+}
 
 repositories {
     mavenCentral()
@@ -49,8 +54,8 @@ tasks.named("startScripts") { Task it ->
     dependsOn tasks.named("shadowJar")
 }
 
-tasks.named("startShadowScripts") { Task it ->
-    dependsOn tasks.named("jar")
+tasks.named("startShadowScripts") {
+    dependsOn tasks.named("shadowJar")
 }
 
 tasks.build {
